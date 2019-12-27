@@ -12,7 +12,7 @@
 
 -supports animations
 
-Notes:
+# Notes:
 
 -it implements only the Gauge
 
