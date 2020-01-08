@@ -4,7 +4,7 @@
 		<ExtensionPackage name="VladsGauge"
 						  description="ThingWorx Unofficial Gauge Widget"
 						  vendor="Vladimir Rosu"
-						  packageVersion="1.0.147" 
+						  packageVersion="1.1.0" 
 						  minimumThingWorxVersion="8.0.0" />
 	</ExtensionPackages>
 	<Widgets>
