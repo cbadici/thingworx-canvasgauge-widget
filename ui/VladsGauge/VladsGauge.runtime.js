@@ -3,7 +3,7 @@ TW.Runtime.Widgets.vladsgauge = function () {
 
 	var localGauge;
 	var opts, dbl_minValue, dbl_MaxValue, bool_SL, str_SLFont, str_SLText, str_SLColor, dbl_SLDigits, dbl_DataLabelTopAlignement, str_DataLabelFontWeight, dbl_RadiusScale, dbl_DataLabelFractionDigits,
-		dbl_lineWidth, dbl_DataLabelBorderWidth, bool_DebugMode, str_DebugContext;
+		dbl_lineWidth, dbl_DataLabelBorderWidth, bool_DebugMode, str_DebugContext,str_PointerColor;
 	//htmlElements
 	var textDiv, gaugeCanvas;
 
@@ -32,7 +32,7 @@ TW.Runtime.Widgets.vladsgauge = function () {
 
 
 
-	//Utilitary function that converts from RGBA format to Hex. Used here because the Gauge library uses only Hex as a color format, and ThingWorx supplies that as RGBA
+	//Utility function that converts from RGBA format to Hex. Used here because the Gauge library uses only Hex as a color format, and ThingWorx supplies that as RGBA
 	function RGBAToHexA(value) {
 		arrayValues = value.substring(value.indexOf("(", 0) + 1, value.indexOf(")", 0)).split(",");
 		arrayValues = arrayValues.map(Number);
@@ -132,6 +132,7 @@ TW.Runtime.Widgets.vladsgauge = function () {
 		dbl_DataLabelFractionDigits = this.getProperty('DataLabelFractionDigits');
 		textDiv.style.borderWidth = this.getProperty('DataLabelBorderWidth') + 'px';
 		str_DebugContext = this.getProperty('DebugContext');
+		str_PointerColor = this.getProperty('PointerColor');
 
 
 		//parsing the state formatting in the format recognized by this library
@@ -142,7 +143,8 @@ TW.Runtime.Widgets.vladsgauge = function () {
 			lineWidth: dbl_lineWidth,
 			pointer: {
 				length: 0.54, // Relative to gauge radius
-				strokeWidth: 0.035 // The thickness
+				strokeWidth: 0.035, // The thickness
+				color: str_PointerColor
 			},
 			limitMax: this.getProperty('LimitMax'),
 			limitMin: this.getProperty('LimitMin'),
@@ -268,7 +270,7 @@ TW.Runtime.Widgets.vladsgauge = function () {
 			}
 			//4. We set the new options object and rerender the gauge. Snippet obtained from the berniie project site
 			localGauge.setOptions(opts);
-			console.warn(new Date().toISOString() + str_DebugContext + ' StateFormatting property changed;Static Zone set to: ' + JSON.stringify(newSF));
+			if (bool_DebugMode) console.warn(new Date().toISOString() + str_DebugContext + ' StateFormatting property changed;Static Zone set to: ' + JSON.stringify(newSF));
 			localGauge.ctx.clearRect(0, 0, localGauge.ctx.canvas.width, localGauge.ctx.canvas.height);
 			localGauge.render();
 

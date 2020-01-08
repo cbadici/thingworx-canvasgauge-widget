@@ -60,6 +60,14 @@ TW.IDE.Widgets.vladsgauge = function () {
 					'isBindingSource': true,
 					'isVisible': true
 				},
+				'PointerColor': {
+                    'baseType' : 'STRING',
+					'defaultValue' : '#FFFFFF',
+					'description':'The color of the pointer',
+					'isBindingTarget': false,
+					'isBindingSource': false,
+					'isVisible': true
+				},
 				'HighDpiSupport': {
                     'baseType' : 'BOOLEAN',
 					'defaultValue' : true,
@@ -176,7 +184,7 @@ TW.IDE.Widgets.vladsgauge = function () {
 					'defaultValue' : 1,
 					'isBindingTarget': true,
 					'isBindingSource': true,
-					'description':'Animation speed. Min/Max: 1/128. 1 is the fastest, 128 is the fastest',
+					'description':'Animation speed. Min/Max: 1/128. 1 is the fastest, 128 is the slowest',
 					'isVisible': true
 				},
 				'ShowTicks': {
