@@ -246,7 +246,7 @@ function InitBerniisGaugeLib() {
     }
 
     TextRenderer.prototype.render = function(gauge) {
-      this.el.style.background=GetColor(gauge.options.staticZones,gauge.value);
+      if (gauge.options.staticZones!==undefined) this.el.style.background=GetColor(gauge.options.staticZones,gauge.value); else this.el.style.background = "#00ff00";
       this.el.style.borderColor=this.el.style.background;
       return this.el.innerHTML = formatNumber(gauge.displayedValue, this.fractionDigits);
     };
