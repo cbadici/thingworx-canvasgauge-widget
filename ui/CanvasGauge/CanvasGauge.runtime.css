@@ -1,0 +1,14 @@
+
+.widget-CanvasGauge
+{
+    display: flex;
+    justify-content: center;
+}
+
+.gaugeText {
+
+    position: absolute;
+    border-style: solid;
+    
+
+}
