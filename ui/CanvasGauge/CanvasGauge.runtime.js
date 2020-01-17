@@ -313,11 +313,10 @@ TW.Runtime.Widgets.canvasgauge = function () {
 			}
 		}
 		if (updatePropertyInfo.TargetProperty === 'DataLabelFractionDigits') {
-			var dbl_newLineWidth = parseFloat(updatePropertyInfo.RawSinglePropertyValue);
-			if (localGauge.options.lineWidth !== dbl_newLineWidth) {
-				dbl_lineWidth = dbl_newLineWidth;
-				opts.lineWidth = dbl_newLineWidth;
-				localGauge.setOptions(opts);
+			var dbl_newFractionDigit = parseFloat(updatePropertyInfo.RawSinglePropertyValue);
+			if (localGauge.options.fractionDigits  !== dbl_newFractionDigit) {
+				dbl_DataLabelFractionDigits = dbl_newFractionDigit;
+				localGauge.setTextField(textDiv, dbl_newFractionDigit);
 				localGauge.ctx.clearRect(0, 0, localGauge.ctx.canvas.width, localGauge.ctx.canvas.height);
 				localGauge.render();
 			}

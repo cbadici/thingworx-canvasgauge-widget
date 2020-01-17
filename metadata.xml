@@ -4,7 +4,7 @@
 		<ExtensionPackage name="CanvasGauge"
 						  description="ThingWorx Unofficial Gauge Widget"
 						  vendor="Vladimir Rosu"
-						  packageVersion="1.1.1" 
+						  packageVersion="1.1.3" 
 						  minimumThingWorxVersion="8.0.0" />
 	</ExtensionPackages>
 	<Widgets>
