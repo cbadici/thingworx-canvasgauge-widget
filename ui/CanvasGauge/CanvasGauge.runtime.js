@@ -8,11 +8,11 @@ TW.Runtime.Widgets.canvasgauge = function () {
 	var textDiv, gaugeCanvas;
 
 	this.renderHtml = function () {
-		var html = '<div class="widget-content widget-CanvasGauge">' +
-			'<canvas> </canvas>' +
-			//placeholder for the value
-			'<div class="gaugeText" style="top:' + this.getProperty("DataLabelTopAlignement") + '%;font:' + this.getProperty("DataLabelFont") + ';z-index:-1"> </div>' +
-			'</div>';
+        var html = '<div class="widget-content widget-CanvasGauge">' +
+            '<canvas> </canvas>' +
+            //placeholder for the value
+            '<div class="gaugeText" style="top:' + this.getProperty("DataLabelTopAlignement") + '%;font:' + this.getProperty("DataLabelFont") + ';z-index:-1;width:32px;text-align:center;"> </div>' +
+            '</div>';
 
 		//since 8.5.1 includes requirejs, we need to properly load the modules after they were loaded there
 		if (typeof window.define === 'function' && (window.define.amd != null)) {
