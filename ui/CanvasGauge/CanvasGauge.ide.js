@@ -14,7 +14,15 @@ TW.IDE.Widgets.canvasgauge = function () {
 					'isBindingSource': true,
 					'isVisible': true,
 					'description':'Percentage from the maximum available Height of the widget',
-                },
+				},
+				'JSONConfiguration': {
+                    'baseType' : 'JSON',
+					'defaultValue' : '',
+					'description':'This allows configuration based on a custom JSON that allows using all the underlying library capabilities. This property is not optimized for speed. Do not bind any of the other properties when using this.',
+					'isBindingTarget': false,
+					'isBindingSource': true,
+					'isVisible': true
+				},
                 'Angle': {
                     'baseType' : 'NUMBER',
 					'defaultValue' : -0.4,

@@ -3,16 +3,16 @@ TW.Runtime.Widgets.canvasgauge = function () {
 
 	var localGauge;
 	var opts, dbl_minValue, dbl_MaxValue, bool_SL, str_SLFont, str_SLText, str_SLColor, dbl_SLDigits, dbl_DataLabelTopAlignement, str_DataLabelFontWeight, dbl_RadiusScale, dbl_DataLabelFractionDigits,
-		dbl_lineWidth, dbl_DataLabelBorderWidth, bool_DebugMode, str_DebugContext,str_PointerColor;
+		dbl_lineWidth, dbl_DataLabelBorderWidth, bool_DebugMode, str_DebugContext, str_PointerColor, json_RAWConfiguration, bool_IsRawConfig;
 	//htmlElements
 	var textDiv, gaugeCanvas;
 
 	this.renderHtml = function () {
-        var html = '<div class="widget-content widget-CanvasGauge">' +
-            '<canvas> </canvas>' +
-            //placeholder for the value
-            '<div class="gaugeText" style="top:' + this.getProperty("DataLabelTopAlignement") + '%;font:' + this.getProperty("DataLabelFont") + ';z-index:-1;width:32px;text-align:center;"> </div>' +
-            '</div>';
+		var html = '<div class="widget-content widget-CanvasGauge">' +
+			'<canvas> </canvas>' +
+			//placeholder for the value
+			'<div class="gaugeText" style="top:' + this.getProperty("DataLabelTopAlignement") + '%;font:' + this.getProperty("DataLabelFont") + ';z-index:-1;width:32px;text-align:center;"> </div>' +
+			'</div>';
 
 		//since 8.5.1 includes requirejs, we need to properly load the modules after they were loaded there
 		if (typeof window.define === 'function' && (window.define.amd != null)) {
@@ -58,7 +58,7 @@ TW.Runtime.Widgets.canvasgauge = function () {
 
 		var staticZones = [];
 		for (var x = 0; x < twSF.StateFormats.length; x++) {
-			
+
 			var stateFormat = twSF.StateFormats[x];
 			var hexColor = RGBAToHexA(stateFormat.state.backgroundColor);
 			var localMinValue = (x === 0) ? functionMinValue : parseFloat(staticZones[staticZones.length - 1].max);
@@ -69,23 +69,20 @@ TW.Runtime.Widgets.canvasgauge = function () {
 				functionMaxVal = localMinValue;
 				localMaxValue = localMinValue;
 			}
-			
-			 staticZones.push({ strokeStyle: hexColor, min: localMinValue, max: localMaxValue });
+
+			staticZones.push({ strokeStyle: hexColor, min: localMinValue, max: localMaxValue });
 		}
 		return staticZones;
 
 	}
 
-	function validateStateZones(stateZone)
-	{
+	function validateStateZones(stateZone) {
 		var bool_IsValid = true;
-		for (var m=0;m<stateZone.length;m++)
-		{
-			var max = stateZone[m].max, min=stateZone[m].min;
+		for (var m = 0; m < stateZone.length; m++) {
+			var max = stateZone[m].max, min = stateZone[m].min;
 
-			if (min==null||min==undefined||max==undefined||max==null||min==max)
-			{
-				bool_IsValid=false;
+			if (min == null || min == undefined || max == undefined || max == null || min == max) {
+				bool_IsValid = false;
 			}
 		}
 		return bool_IsValid;
@@ -116,6 +113,37 @@ TW.Runtime.Widgets.canvasgauge = function () {
 
 	}
 
+	//basic check if a string is JSON format 
+	function isValidJSON(JSONObject) {
+		//try {
+		//return (JSON.parse(str) && !!str && );
+		return Object.keys(JSONObject).length > 0;
+		//} catch (e) {
+		//	return false;
+		//}
+	}
+
+	function setConfig(localGauge, json_RAWConfiguration, gaugeCanvas) {
+		//var object1 = { "methods": [{ "setValue": 10 }, { "setOptions": {} }, { "setMin": 10 }], "properties": [{ "min": 10 }] };
+		if (bool_DebugMode) console.warn(new Date().toISOString() + str_DebugContext + ' New configuration received. Content: ' + JSON.stringify(json_RAWConfiguration));
+		if (json_RAWConfiguration.recreate && json_RAWConfiguration.recreate === true)
+			localGauge = new Gauge(gaugeCanvas);
+		for (var i = 0; i < json_RAWConfiguration.methods.length; i++) {
+			let keyName = Object.keys(json_RAWConfiguration.methods[i])[0];
+			let keyValue = json_RAWConfiguration.methods[i][keyName];
+			localGauge[keyName](keyValue);
+			//for the resize function to work
+			if (keyName=="setOptions") opts = keyValue;
+		}
+		for (var i = 0; i < json_RAWConfiguration.properties.length; i++) {
+			let keyName = Object.keys(json_RAWConfiguration.properties[i])[0];
+			let keyValue = json_RAWConfiguration.properties[i][keyName];
+			localGauge[keyName] = keyValue;
+		}
+
+	}
+
+
 	this.afterRender = function () {
 		textDiv = this.jqElement[0].childNodes[1];
 		gaugeCanvas = this.jqElement[0].childNodes[0];
@@ -133,65 +161,73 @@ TW.Runtime.Widgets.canvasgauge = function () {
 		textDiv.style.borderWidth = this.getProperty('DataLabelBorderWidth') + 'px';
 		str_DebugContext = this.getProperty('DebugContext');
 		str_PointerColor = this.getProperty('PointerColor');
-
+		json_RAWConfiguration = this.getProperty('JSONConfiguration');
+		//bool_IsRawConfig = isJSON(json_RAWConfiguration); 
+		bool_IsRawConfig = isValidJSON(json_RAWConfiguration);
 
 		//parsing the state formatting in the format recognized by this library
-		opts = {
-			angle: this.getProperty('Angle'), /// The span of the gauge arc
-			lineWidth: this.getProperty('LineWidth'), // The line thickness
-			radiusScale: dbl_RadiusScale,
-			lineWidth: dbl_lineWidth,
-			pointer: {
-				length: 0.54, // Relative to gauge radius
-				strokeWidth: 0.035, // The thickness
-				color: str_PointerColor
-			},
-			limitMax: this.getProperty('LimitMax'),
-			limitMin: this.getProperty('LimitMin'),
-			colorStart: this.getProperty('ColorStart'),   // Colors
-			strokeColor: this.getProperty('StrokeColor'),   // to see which ones work best for you
-			generateGradient: false,
-			highDpiSupport: this.getProperty('HighDpiSupport')
-		};
-		var stateFormats = this.getProperty('StateFormatting');
-		if (stateFormats !== undefined) {
-
-			opts.staticZones = convertTWSFtoBernieSF(stateFormats, dbl_minValue, dbl_MaxValue);
+		if (bool_IsRawConfig === true) {
+			setConfig(localGauge, json_RAWConfiguration, gaugeCanvas);
+			if (bool_DebugMode) console.warn(new Date().toISOString() + str_DebugContext + ' Gauge was initialized first time from RAW Json.');
 		}
-		if (showTicks !== undefined && showTicks === true) {
-			opts.renderTicks = {
-				divisions: this.getProperty('DivisionCount'),
-				divWidth: this.getProperty('DivisionWidth'),
-				divLength: this.getProperty('DivisionLength'),
-				divColor: this.getProperty('DivisionColor'),
-				subDivisions: this.getProperty('SubdivisionCount'),
-				subLength: this.getProperty('SubdivisionLength'),
-				subWidth: this.getProperty('SubdivisionWidth'),
-				subColor: this.getProperty('SubdivisionColor')
-
+		else {
+			opts = {
+				angle: this.getProperty('Angle'), /// The span of the gauge arc
+				lineWidth: this.getProperty('LineWidth'), // The line thickness
+				radiusScale: dbl_RadiusScale,
+				lineWidth: dbl_lineWidth,
+				pointer: {
+					length: 0.54, // Relative to gauge radius
+					strokeWidth: 0.035, // The thickness
+					color: str_PointerColor
+				},
+				limitMax: this.getProperty('LimitMax'),
+				limitMin: this.getProperty('LimitMin'),
+				colorStart: this.getProperty('ColorStart'),   // Colors
+				strokeColor: this.getProperty('StrokeColor'),   // to see which ones work best for you
+				generateGradient: false,
+				highDpiSupport: this.getProperty('HighDpiSupport')
 			};
+			var stateFormats = this.getProperty('StateFormatting');
+			if (stateFormats !== undefined) {
 
-		}
-		if (bool_SL !== undefined && bool_SL === true) {
-			opts.staticLabels = {
-				font: this.getProperty('StaticLabelsFont'),
-				labels: this.getProperty('StaticLabelsText') === "" ? GetStaticLabels(opts, this) : this.getProperty('StaticLabelsText'),
-				color: this.getProperty('StaticLabelsColor'),
-				fractionDigits: this.getProperty('StaticLabelsFractionDigits')
+				opts.staticZones = convertTWSFtoBernieSF(stateFormats, dbl_minValue, dbl_MaxValue);
+			}
+			if (showTicks !== undefined && showTicks === true) {
+				opts.renderTicks = {
+					divisions: this.getProperty('DivisionCount'),
+					divWidth: this.getProperty('DivisionWidth'),
+					divLength: this.getProperty('DivisionLength'),
+					divColor: this.getProperty('DivisionColor'),
+					subDivisions: this.getProperty('SubdivisionCount'),
+					subLength: this.getProperty('SubdivisionLength'),
+					subWidth: this.getProperty('SubdivisionWidth'),
+					subColor: this.getProperty('SubdivisionColor')
+
+				};
+
+			}
+			if (bool_SL !== undefined && bool_SL === true) {
+				opts.staticLabels = {
+					font: this.getProperty('StaticLabelsFont'),
+					labels: this.getProperty('StaticLabelsText') === "" ? GetStaticLabels(opts, this) : this.getProperty('StaticLabelsText'),
+					color: this.getProperty('StaticLabelsColor'),
+					fractionDigits: this.getProperty('StaticLabelsFractionDigits')
+				}
+
 			}
 
+			//the Gauge constructor needs a HTML canvas as a constructor
+			localGauge = new Gauge(gaugeCanvas).setOptions(opts); // create gauge!
+			if (bool_DebugMode) console.warn(new Date().toISOString() + str_DebugContext + ' After render init: ' + JSON.stringify(opts.staticZones));
+			//the gauge needs a HTML div to write its value;
+			localGauge.setTextField(textDiv, dbl_DataLabelFractionDigits);
+
+			localGauge.maxValue = this.getProperty('MaxValue'); // set max gauge value
+			localGauge.animationSpeed = this.getProperty('AnimationSpeed');
+			localGauge.setMinValue(this.getProperty('MinValue'));  // set min value
+			localGauge.set(this.getProperty('Data'));
 		}
-
-		//the Gauge constructor needs a HTML canvas as a constructor
-		localGauge = new Gauge(gaugeCanvas).setOptions(opts); // create gauge!
-		if (bool_DebugMode) console.warn(new Date().toISOString() + str_DebugContext + ' After render init: ' + JSON.stringify(opts.staticZones));
-		//the gauge needs a HTML div to write its value;
-		localGauge.setTextField(textDiv, dbl_DataLabelFractionDigits);
-
-		localGauge.maxValue = this.getProperty('MaxValue'); // set max gauge value
-		localGauge.animationSpeed = this.getProperty('AnimationSpeed');
-		localGauge.setMinValue(this.getProperty('MinValue'));  // set min value
-		localGauge.set(this.getProperty('Data'));
 		if (bool_DebugMode) console.warn(new Date().toISOString() + str_DebugContext + ' After render init finished. Static Zones: ' + JSON.stringify(opts.staticZones));
 
 	};
@@ -211,7 +247,7 @@ TW.Runtime.Widgets.canvasgauge = function () {
 			var newValue = parseFloat(updatePropertyInfo.SinglePropertyValue);
 			if (localGauge.minValue !== newValue) {
 				dbl_minValue = newValue;
-				
+
 				var newSF = convertTWSFtoBernieSF(this.getProperty('StateFormatting'), dbl_minValue, dbl_MaxValue);
 				//2. Apply the new zones only if the new static zones are different than the old ones
 				if (JSON.stringify(localGauge.options.staticZones) !== JSON.stringify(newSF)) {
@@ -222,7 +258,7 @@ TW.Runtime.Widgets.canvasgauge = function () {
 				localGauge.setMinValue(newValue);
 				localGauge.ctx.clearRect(0, 0, localGauge.ctx.canvas.width, localGauge.ctx.canvas.height);
 				localGauge.render();
-				if (bool_DebugMode) console.warn(new Date().toISOString() + str_DebugContext + ' Different Min Value detected and set: ' + newValue+'/n'+"; new Calculated StateFormatting is: "+JSON.stringify(newSF));
+				if (bool_DebugMode) console.warn(new Date().toISOString() + str_DebugContext + ' Different Min Value detected and set: ' + newValue + '/n' + "; new Calculated StateFormatting is: " + JSON.stringify(newSF));
 			}
 		}
 		if (updatePropertyInfo.TargetProperty === 'MaxValue' && updatePropertyInfo.SinglePropertyValue != undefined) {
@@ -241,7 +277,7 @@ TW.Runtime.Widgets.canvasgauge = function () {
 				localGauge.maxValue = newValue;
 				localGauge.ctx.clearRect(0, 0, localGauge.ctx.canvas.width, localGauge.ctx.canvas.height);
 				localGauge.render();
-				if (bool_DebugMode) console.warn(new Date().toISOString() + str_DebugContext + ' Different Max Value detected and set: ' + newValue+'/n'+"; new Calculated StateFormatting is: "+JSON.stringify(newSF));
+				if (bool_DebugMode) console.warn(new Date().toISOString() + str_DebugContext + ' Different Max Value detected and set: ' + newValue + '/n' + "; new Calculated StateFormatting is: " + JSON.stringify(newSF));
 			}
 		}
 
@@ -314,7 +350,7 @@ TW.Runtime.Widgets.canvasgauge = function () {
 		}
 		if (updatePropertyInfo.TargetProperty === 'DataLabelFractionDigits') {
 			var dbl_newFractionDigit = parseFloat(updatePropertyInfo.RawSinglePropertyValue);
-			if (localGauge.options.fractionDigits  !== dbl_newFractionDigit) {
+			if (localGauge.options.fractionDigits !== dbl_newFractionDigit) {
 				dbl_DataLabelFractionDigits = dbl_newFractionDigit;
 				localGauge.setTextField(textDiv, dbl_newFractionDigit);
 				localGauge.ctx.clearRect(0, 0, localGauge.ctx.canvas.width, localGauge.ctx.canvas.height);
@@ -326,6 +362,11 @@ TW.Runtime.Widgets.canvasgauge = function () {
 			if (str_DebugContext != str_NewDebugContext)
 				str_DebugContext = str_NewDebugContext;
 		}
+		if (updatePropertyInfo.TargetProperty === 'JSONConfiguration') {
+			var newJSONRawConfig = updatePropertyInfo.SinglePropertyValue;
+			setConfig(localGauge,newJSONRawConfig,gaugeCanvas);
+		}
+
 
 
 

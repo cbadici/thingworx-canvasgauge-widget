@@ -2,9 +2,9 @@
 <Entities>
 	<ExtensionPackages>
 		<ExtensionPackage name="CanvasGauge"
-						  description="ThingWorx Unofficial Gauge Widget"
+						  description="ThingWorx Unofficial Gauge Widget / Not supported"
 						  vendor="Vladimir Rosu"
-						  packageVersion="1.1.5" 
+						  packageVersion="1.1.6" 
 						  minimumThingWorxVersion="8.0.0" />
 	</ExtensionPackages>
 	<Widgets>
