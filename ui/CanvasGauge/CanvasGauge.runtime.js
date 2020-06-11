@@ -133,7 +133,7 @@ TW.Runtime.Widgets.canvasgauge = function () {
 			let keyValue = json_RAWConfiguration.methods[i][keyName];
 			localGauge[keyName](keyValue);
 			//for the resize function to work
-			if (keyName=="setOptions") opts = keyValue;
+			if (keyName == "setOptions") opts = keyValue;
 		}
 		for (var i = 0; i < json_RAWConfiguration.properties.length; i++) {
 			let keyName = Object.keys(json_RAWConfiguration.properties[i])[0];
@@ -240,12 +240,12 @@ TW.Runtime.Widgets.canvasgauge = function () {
 		if (updatePropertyInfo.TargetProperty === 'Data') {
 			//don't trigger redraw if the new value = old value; no longer requires the expressions
 			var newValue = parseFloat(updatePropertyInfo.SinglePropertyValue);
-			if (localGauge.value !== newValue) localGauge.set(newValue);
+			if (bool_IsRawConfig == false && localGauge.value !== newValue) localGauge.set(newValue);
 		}
 		if (updatePropertyInfo.TargetProperty === 'MinValue' && updatePropertyInfo.SinglePropertyValue != undefined) {
 			//don't trigger redraw if the new value = old value; no longer requires the expressions
 			var newValue = parseFloat(updatePropertyInfo.SinglePropertyValue);
-			if (localGauge.minValue !== newValue) {
+			if (bool_IsRawConfig == false && localGauge.minValue !== newValue) {
 				dbl_minValue = newValue;
 
 				var newSF = convertTWSFtoBernieSF(this.getProperty('StateFormatting'), dbl_minValue, dbl_MaxValue);
@@ -266,7 +266,7 @@ TW.Runtime.Widgets.canvasgauge = function () {
 
 
 			var newValue = parseFloat(updatePropertyInfo.SinglePropertyValue);
-			if (localGauge.maxValue !== newValue) {
+			if (bool_IsRawConfig == false && localGauge.maxValue !== newValue) {
 				dbl_MaxValue = newValue;
 				var newSF = convertTWSFtoBernieSF(this.getProperty('StateFormatting'), dbl_minValue, dbl_MaxValue);
 				//2. Apply the new zones only if the new static zones are different than the old ones
@@ -282,45 +282,52 @@ TW.Runtime.Widgets.canvasgauge = function () {
 		}
 
 		if (updatePropertyInfo.TargetProperty === 'Angle') {
-			opts.angle = parseFloat(updatePropertyInfo.RawSinglePropertyValue);
-			localGauge.setOptions(opts);
-			localGauge.ctx.clearRect(0, 0, localGauge.ctx.canvas.width, localGauge.ctx.canvas.height);
-			localGauge.render();
+			if (bool_IsRawConfig == false) {
+				opts.angle = parseFloat(updatePropertyInfo.RawSinglePropertyValue);
+				localGauge.setOptions(opts);
+				localGauge.ctx.clearRect(0, 0, localGauge.ctx.canvas.width, localGauge.ctx.canvas.height);
+				localGauge.render();
+			}
 		}
+
 		if (updatePropertyInfo.TargetProperty === 'StateFormatting' && updatePropertyInfo.SinglePropertyValue != undefined) {
 			//this is a two step process because once the state based formatting is changed, if show static labels is set, we need to set also the static labels
 
 			//1. Get the new staticZones in the berniie format
 			var newSF = convertTWSFtoBernieSF(this.getProperty('StateFormatting'), dbl_minValue, dbl_MaxValue);
 			//2. Apply the new zones only if the new static zones are different than the old ones
-			if (JSON.stringify(localGauge.options.staticZones) !== JSON.stringify(newSF)) {
-				opts.staticZones = newSF;
+			if (bool_IsRawConfig == false) {
+				if (JSON.stringify(localGauge.options.staticZones) !== JSON.stringify(newSF)) {
+					opts.staticZones = newSF;
 
-			}
-			//3. If the show static labels is set, we need to update the static labels
-			if (bool_SL !== undefined && bool_SL === true && this.getProperty('StaticLabelsText') === "") {
-				var new_SL = GetStaticLabels(opts, this);
-				if (JSON.stringify(new_SL) != JSON.stringify(opts.staticLabels.labels)) {
-					opts.staticLabels.labels = new_SL;
 				}
+				//3. If the show static labels is set, we need to update the static labels
+				if (bool_SL !== undefined && bool_SL === true && this.getProperty('StaticLabelsText') === "") {
+					var new_SL = GetStaticLabels(opts, this);
+					if (JSON.stringify(new_SL) != JSON.stringify(opts.staticLabels.labels)) {
+						opts.staticLabels.labels = new_SL;
+					}
+				}
+				//4. We set the new options object and rerender the gauge. Snippet obtained from the berniie project site
+				localGauge.setOptions(opts);
+				if (bool_DebugMode) console.warn(new Date().toISOString() + str_DebugContext + ' StateFormatting property changed;Static Zone set to: ' + JSON.stringify(newSF));
+				localGauge.ctx.clearRect(0, 0, localGauge.ctx.canvas.width, localGauge.ctx.canvas.height);
+				localGauge.render();
+
 			}
-			//4. We set the new options object and rerender the gauge. Snippet obtained from the berniie project site
-			localGauge.setOptions(opts);
-			if (bool_DebugMode) console.warn(new Date().toISOString() + str_DebugContext + ' StateFormatting property changed;Static Zone set to: ' + JSON.stringify(newSF));
-			localGauge.ctx.clearRect(0, 0, localGauge.ctx.canvas.width, localGauge.ctx.canvas.height);
-			localGauge.render();
-
-
 		}
 		if (updatePropertyInfo.TargetProperty === 'DivisionCount') {
-			opts.renderTicks.divisions = parseInt(updatePropertyInfo.RawSinglePropertyValue);
-			localGauge.setOptions(opts);
-			localGauge.ctx.clearRect(0, 0, localGauge.ctx.canvas.width, localGauge.ctx.canvas.height);
-			localGauge.render();
+			if (bool_IsRawConfig == false) {
+				opts.renderTicks.divisions = parseInt(updatePropertyInfo.RawSinglePropertyValue);
+				localGauge.setOptions(opts);
+				localGauge.ctx.clearRect(0, 0, localGauge.ctx.canvas.width, localGauge.ctx.canvas.height);
+				localGauge.render();
+			}
 		}
 		if (updatePropertyInfo.TargetProperty === 'DataLabelTopAlignement') {
 			var newTop = updatePropertyInfo.SinglePropertyValue;
-			textDiv.style.top = "" + newTop + "%";
+			if (bool_IsRawConfig == false)
+				textDiv.style.top = "" + newTop + "%";
 
 		}
 		/* if (updatePropertyInfo.TargetProperty === 'DataLabelLeftAlignement') {
@@ -330,7 +337,7 @@ TW.Runtime.Widgets.canvasgauge = function () {
 		} */
 		if (updatePropertyInfo.TargetProperty === 'RadiusScale') {
 			var dbl_newRadiusScale = parseFloat(updatePropertyInfo.RawSinglePropertyValue);
-			if (localGauge.options.radiusScale !== dbl_newRadiusScale) {
+			if (bool_IsRawConfig == false && localGauge.options.radiusScale !== dbl_newRadiusScale) {
 				dbl_RadiusScale = dbl_newRadiusScale;
 				opts.radiusScale = dbl_newRadiusScale;
 				localGauge.setOptions(opts);
@@ -340,7 +347,7 @@ TW.Runtime.Widgets.canvasgauge = function () {
 		}
 		if (updatePropertyInfo.TargetProperty === 'LineWidth') {
 			var dbl_newLineWidth = parseFloat(updatePropertyInfo.RawSinglePropertyValue);
-			if (localGauge.options.lineWidth !== dbl_newLineWidth) {
+			if (bool_IsRawConfig == false && localGauge.options.lineWidth !== dbl_newLineWidth) {
 				dbl_lineWidth = dbl_newLineWidth;
 				opts.lineWidth = dbl_newLineWidth;
 				localGauge.setOptions(opts);
@@ -350,7 +357,7 @@ TW.Runtime.Widgets.canvasgauge = function () {
 		}
 		if (updatePropertyInfo.TargetProperty === 'DataLabelFractionDigits') {
 			var dbl_newFractionDigit = parseFloat(updatePropertyInfo.RawSinglePropertyValue);
-			if (localGauge.options.fractionDigits !== dbl_newFractionDigit) {
+			if (bool_IsRawConfig == false && localGauge.options.fractionDigits !== dbl_newFractionDigit) {
 				dbl_DataLabelFractionDigits = dbl_newFractionDigit;
 				localGauge.setTextField(textDiv, dbl_newFractionDigit);
 				localGauge.ctx.clearRect(0, 0, localGauge.ctx.canvas.width, localGauge.ctx.canvas.height);
@@ -364,7 +371,7 @@ TW.Runtime.Widgets.canvasgauge = function () {
 		}
 		if (updatePropertyInfo.TargetProperty === 'JSONConfiguration') {
 			var newJSONRawConfig = updatePropertyInfo.SinglePropertyValue;
-			setConfig(localGauge,newJSONRawConfig,gaugeCanvas);
+			setConfig(localGauge, newJSONRawConfig, gaugeCanvas);
 		}
 
 
