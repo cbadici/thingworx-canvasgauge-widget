@@ -19,8 +19,8 @@ TW.IDE.Widgets.canvasgauge = function () {
                     'baseType' : 'JSON',
 					'defaultValue' : '',
 					'description':'This allows configuration based on a custom JSON that allows using all the underlying library capabilities. This property is not optimized for speed. Do not bind any of the other properties when using this.',
-					'isBindingTarget': false,
-					'isBindingSource': true,
+					'isBindingTarget': true,
+					'isBindingSource': false,
 					'isVisible': true
 				},
                 'Angle': {
