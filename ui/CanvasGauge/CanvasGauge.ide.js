@@ -23,6 +23,14 @@ TW.IDE.Widgets.canvasgauge = function () {
 					'isBindingSource': false,
 					'isVisible': true
 				},
+				'IsJSONConfigured': {
+                    'baseType' : 'BOOLEAN',
+					'defaultValue' : false,
+					'description':'If true, the widget will be configured from the JSONConfiguration property and all other properties will not be used',
+					'isBindingTarget': true,
+					'isBindingSource': false,
+					'isVisible': true
+                },
                 'Angle': {
                     'baseType' : 'NUMBER',
 					'defaultValue' : -0.4,
