@@ -379,7 +379,8 @@ TW.Runtime.Widgets.canvasgauge = function () {
 				str_DebugContext = str_NewDebugContext;
 		}
 		if (updatePropertyInfo.TargetProperty === 'JSONConfiguration') {
-			var newJSONRawConfig = updatePropertyInfo.RawDataFromInvoke;
+			var newJSONRawConfig;
+			(updatePropertyInfo.RawDataFromInvoke)?newJSONRawConfig = updatePropertyInfo.RawDataFromInvoke:newJSONRawConfig=updatePropertyInfo.RawSinglePropertyValue ;
 			if (bool_IsRawConfig === true) setConfig(localGauge, newJSONRawConfig, gaugeCanvas);
 		}
 
