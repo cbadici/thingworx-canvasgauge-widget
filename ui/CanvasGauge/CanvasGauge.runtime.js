@@ -114,17 +114,27 @@ TW.Runtime.Widgets.canvasgauge = function () {
 	}
 
 	//basic check if a string is JSON format 
-	function isValidJSON(JSONObject) {
-		//try {
-		//return (JSON.parse(str) && !!str && );
-		return Object.keys(JSONObject).length > 0;
-		//} catch (e) {
-		//	return false;
-		//}
+	function processJSON(JSONObject) {
+		let noOfKeys = Object.keys(JSONObject).length;
+		if (noOfKeys > 0 && noOfKeys<4)
+		{return JSONObject;
+		}
+		else 
+
+		{
+			return JSON.parse(JSONObject);
+		}
+		
+	}
+
+	function isValidJSON(JSONObject)
+	{
+		let noOfKeys = Object.keys(JSONObject).length;
+		return (noOfKeys > 0 && noOfKeys<4);
 	}
 
 	function setConfig(localGauge, json_RAWConfiguration, gaugeCanvas) {
-		if (isValidJSON(json_RAWConfiguration)) {
+		if (isValidJSON(processJSON(json_RAWConfiguration))) {
 			if (bool_DebugMode) console.warn(new Date().toISOString() + str_DebugContext + ' New configuration received. Content: ' + JSON.stringify(json_RAWConfiguration));
 			if (json_RAWConfiguration.recreate && json_RAWConfiguration.recreate === true)
 				localGauge = new Gauge(gaugeCanvas);
@@ -381,6 +391,7 @@ TW.Runtime.Widgets.canvasgauge = function () {
 		if (updatePropertyInfo.TargetProperty === 'JSONConfiguration') {
 			var newJSONRawConfig;
 			(updatePropertyInfo.RawDataFromInvoke)?newJSONRawConfig = updatePropertyInfo.RawDataFromInvoke:newJSONRawConfig=updatePropertyInfo.RawSinglePropertyValue ;
+
 			if (bool_IsRawConfig === true) setConfig(localGauge, newJSONRawConfig, gaugeCanvas);
 		}
 
