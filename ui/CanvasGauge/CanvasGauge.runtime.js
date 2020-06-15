@@ -134,7 +134,9 @@ TW.Runtime.Widgets.canvasgauge = function () {
 	}
 
 	function setConfig(localGauge, json_RAWConfiguration, gaugeCanvas) {
-		if (isValidJSON(processJSON(json_RAWConfiguration))) {
+		// fix for mashup builder conversion to string from Expression
+		json_RAWConfiguration = processJSON(json_RAWConfiguration);
+		if (isValidJSON(json_RAWConfiguration)) {
 			if (bool_DebugMode) console.warn(new Date().toISOString() + str_DebugContext + ' New configuration received. Content: ' + JSON.stringify(json_RAWConfiguration));
 			if (json_RAWConfiguration.recreate && json_RAWConfiguration.recreate === true)
 				localGauge = new Gauge(gaugeCanvas);
