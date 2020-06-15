@@ -11,7 +11,7 @@ TW.Runtime.Widgets.canvasgauge = function () {
 		var html = '<div class="widget-content widget-CanvasGauge">' +
 			'<canvas> </canvas>' +
 			//placeholder for the value
-			(this.getProperty("IsJSONConfigured")===true ? '' : ('<div class="gaugeText" style="top:' + this.getProperty("DataLabelTopAlignement") + '%;font:' + this.getProperty("DataLabelFont") + ';z-index:-1;width:32px;text-align:center;"> </div>')) +
+			(this.getProperty("IsJSONConfigured") === true ? '' : ('<div class="gaugeText" style="top:' + this.getProperty("DataLabelTopAlignement") + '%;font:' + this.getProperty("DataLabelFont") + ';z-index:-1;width:32px;text-align:center;"> </div>')) +
 			'</div>';
 
 		//since 8.5.1 includes requirejs, we need to properly load the modules after they were loaded there
@@ -25,7 +25,7 @@ TW.Runtime.Widgets.canvasgauge = function () {
 			window.__define = undefined;
 		}
 
-		if (this.getProperty("DebugMode")===true) console.warn(new Date().toISOString() + str_DebugContext + ' Gauge entered the renderHtml() function.');
+		if (this.getProperty("DebugMode") === true) console.warn(new Date().toISOString() + str_DebugContext + ' Gauge entered the renderHtml() function.');
 
 		return html;
 	};
@@ -124,24 +124,27 @@ TW.Runtime.Widgets.canvasgauge = function () {
 	}
 
 	function setConfig(localGauge, json_RAWConfiguration, gaugeCanvas) {
-		if (isValidJSON(json_RAWConfiguration))
-		{
-		if (bool_DebugMode) console.warn(new Date().toISOString() + str_DebugContext + ' New configuration received. Content: ' + JSON.stringify(json_RAWConfiguration));
-		if (json_RAWConfiguration.recreate && json_RAWConfiguration.recreate === true)
-			localGauge = new Gauge(gaugeCanvas);
-		for (var i = 0; i < json_RAWConfiguration.methods.length; i++) {
-			let keyName = Object.keys(json_RAWConfiguration.methods[i])[0];
-			let keyValue = json_RAWConfiguration.methods[i][keyName];
-			localGauge[keyName](keyValue);
-			//for the resize function to work without modifications
-			if (keyName == "setOptions") opts = keyValue;
+		if (isValidJSON(json_RAWConfiguration)) {
+			if (bool_DebugMode) console.warn(new Date().toISOString() + str_DebugContext + ' New configuration received. Content: ' + JSON.stringify(json_RAWConfiguration));
+			if (json_RAWConfiguration.recreate && json_RAWConfiguration.recreate === true)
+				localGauge = new Gauge(gaugeCanvas);
+			if (json_RAWConfiguration.methods) {
+				for (var i = 0; i < json_RAWConfiguration.methods.length; i++) {
+					let keyName = Object.keys(json_RAWConfiguration.methods[i])[0];
+					let keyValue = json_RAWConfiguration.methods[i][keyName];
+					localGauge[keyName](keyValue);
+					//for the resize function to work without modifications
+					if (keyName == "setOptions") opts = keyValue;
+				}
+			}
+			if (json_RAWConfiguration.properties) {
+				for (var i = 0; i < json_RAWConfiguration.properties.length; i++) {
+					let keyName = Object.keys(json_RAWConfiguration.properties[i])[0];
+					let keyValue = json_RAWConfiguration.properties[i][keyName];
+					localGauge[keyName] = keyValue;
+				}
+			}
 		}
-		for (var i = 0; i < json_RAWConfiguration.properties.length; i++) {
-			let keyName = Object.keys(json_RAWConfiguration.properties[i])[0];
-			let keyValue = json_RAWConfiguration.properties[i][keyName];
-			localGauge[keyName] = keyValue;
-		}
-	}
 
 	}
 
@@ -152,7 +155,7 @@ TW.Runtime.Widgets.canvasgauge = function () {
 		gaugeCanvas.width = this.jqElement[0].offsetWidth;
 		gaugeCanvas.height = this.jqElement[0].offsetHeight;
 		//all the getProperty calls that happen in afterRender retrieve the values set in Composer (not the values obtained from the bindings).
-		bool_IsRawConfig =this.getProperty('IsJSONConfigured');
+		bool_IsRawConfig = this.getProperty('IsJSONConfigured');
 		dbl_MaxValue = this.getProperty('MaxValue');
 		dbl_minValue = this.getProperty('MinValue');
 		var showTicks = this.getProperty('ShowTicks');
@@ -161,11 +164,11 @@ TW.Runtime.Widgets.canvasgauge = function () {
 		dbl_RadiusScale = this.getProperty("RadiusScale");
 		dbl_lineWidth = this.getProperty("LineWidth");
 		dbl_DataLabelFractionDigits = this.getProperty('DataLabelFractionDigits');
-		if (bool_IsRawConfig===false) textDiv.style.borderWidth = this.getProperty('DataLabelBorderWidth') + 'px';
+		if (bool_IsRawConfig === false) textDiv.style.borderWidth = this.getProperty('DataLabelBorderWidth') + 'px';
 		str_DebugContext = this.getProperty('DebugContext');
 		str_PointerColor = this.getProperty('PointerColor');
 		json_RAWConfiguration = this.getProperty('JSONConfiguration');
-	
+
 		//bool_IsRawConfig = isValidJSON(json_RAWConfiguration);
 
 
@@ -377,7 +380,7 @@ TW.Runtime.Widgets.canvasgauge = function () {
 		}
 		if (updatePropertyInfo.TargetProperty === 'JSONConfiguration') {
 			var newJSONRawConfig = updatePropertyInfo.RawDataFromInvoke;
-			if (bool_IsRawConfig===true) setConfig(localGauge, newJSONRawConfig, gaugeCanvas);
+			if (bool_IsRawConfig === true) setConfig(localGauge, newJSONRawConfig, gaugeCanvas);
 		}
 
 
