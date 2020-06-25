@@ -140,6 +140,13 @@ TW.Runtime.Widgets.canvasgauge = function () {
 			if (bool_DebugMode) console.warn(new Date().toISOString() + str_DebugContext + ' New configuration received. Content: ' + JSON.stringify(json_RAWConfiguration));
 			if (json_RAWConfiguration.recreate && json_RAWConfiguration.recreate === true)
 				localGauge = new Gauge(gaugeCanvas);
+			if (json_RAWConfiguration.properties) {
+				for (var i = 0; i < json_RAWConfiguration.properties.length; i++) {
+					let keyName = Object.keys(json_RAWConfiguration.properties[i])[0];
+					let keyValue = json_RAWConfiguration.properties[i][keyName];
+					localGauge[keyName] = keyValue;
+				}
+			}
 			if (json_RAWConfiguration.methods) {
 				for (var i = 0; i < json_RAWConfiguration.methods.length; i++) {
 					let keyName = Object.keys(json_RAWConfiguration.methods[i])[0];
@@ -149,13 +156,7 @@ TW.Runtime.Widgets.canvasgauge = function () {
 					if (keyName == "setOptions") opts = keyValue;
 				}
 			}
-			if (json_RAWConfiguration.properties) {
-				for (var i = 0; i < json_RAWConfiguration.properties.length; i++) {
-					let keyName = Object.keys(json_RAWConfiguration.properties[i])[0];
-					let keyValue = json_RAWConfiguration.properties[i][keyName];
-					localGauge[keyName] = keyValue;
-				}
-			}
+			
 		}
 
 	}

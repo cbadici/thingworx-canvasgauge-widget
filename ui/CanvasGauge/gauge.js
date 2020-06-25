@@ -622,7 +622,7 @@ function InitBerniisGaugeLib() {
     Gauge.prototype.renderStaticLabels = function(staticLabels, w, h, radius) {
       var font, fontsize, j, len, match, re, ref, rest, rotationAngle, value;
       this.ctx.save();
-      this.ctx.translate(w, h);
+      this.ctx.translate(w, h - 20);
       font = staticLabels.font || "10px Times";
       re = /\d+\.?\d?/;
       match = font.match(re)[0];
